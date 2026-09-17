@@ -70,7 +70,7 @@ export function EntradaPanel({
               <p className="text-[0.65rem] tracking-[0.2em] text-neutral-400 uppercase">
                 Sesión {siguiente.sesion} →
               </p>
-              <p className="mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
+              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
                 {siguiente.title}
               </p>
             </Link>

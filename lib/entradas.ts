@@ -53,7 +53,10 @@ export function getEntradaSlugs() {
 export function getAllEntradas(): EntradaMeta[] {
   return getEntradaSlugs()
     .map((slug) => {
-      const raw = fs.readFileSync(path.join(CONTENT_DIR, `${slug}.mdx`), "utf8");
+      const raw = fs.readFileSync(
+        path.join(CONTENT_DIR, `${slug}.mdx`),
+        "utf8",
+      );
       const { data } = matter(raw);
       return { slug, ...assertMeta(data, slug) };
     })
@@ -65,9 +68,7 @@ export async function getEntrada(slug: string) {
   if (!fs.existsSync(filePath)) return null;
 
   const source = fs.readFileSync(filePath, "utf8");
-  const { content, frontmatter } = await compileMDX<
-    Omit<EntradaMeta, "slug">
-  >({
+  const { content, frontmatter } = await compileMDX<Omit<EntradaMeta, "slug">>({
     source,
     components: mdxComponents,
     options: { parseFrontmatter: true },
