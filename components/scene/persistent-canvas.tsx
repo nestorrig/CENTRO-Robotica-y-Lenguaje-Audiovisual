@@ -4,17 +4,16 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useControls } from "leva";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { EntryGroup } from "@/components/scene/entry-group";
-import { getJourneyScenes, getScene } from "@/components/scene/scenes";
+import { EntryScene, getJourneyPageIds } from "@/components/scene/registry";
 import { detailScroll, journeyOffset } from "@/lib/journey-store";
 import { palette } from "@/lib/palette";
 import type { EntradaSlide } from "@/lib/types";
 
 function SceneLights() {
   const { ambient, key, fill } = useControls("Luces", {
-    ambient: { value: 0.85, min: 0, max: 2, step: 0.01 },
-    key: { value: 1.15, min: 0, max: 3, step: 0.01 },
-    fill: { value: 0.35, min: 0, max: 2, step: 0.01 },
+    ambient: { value: 2, min: 0, max: 4, step: 0.01 },
+    key: { value: 2.5, min: 0, max: 3, step: 0.01 },
+    fill: { value: 2, min: 0, max: 2, step: 0.01 },
   });
 
   return (
@@ -26,28 +25,17 @@ function SceneLights() {
   );
 }
 
-function JourneyScene({
-  entradas,
-  color,
-  roughness,
-  metalness,
-}: {
-  entradas: EntradaSlide[];
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
+function JourneyScene({ entradas }: { entradas: EntradaSlide[] }) {
   const group = useRef<THREE.Group>(null);
   const { height } = useThree((state) => state.viewport);
-  const scenes = useMemo(
-    () => getJourneyScenes(entradas.map((entrada) => entrada.slug)),
+  const pageIds = useMemo(
+    () => getJourneyPageIds(entradas.map((entrada) => entrada.slug)),
     [entradas],
   );
-  const pages = Math.max(scenes.length, 1);
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    const target = journeyOffset.get() * height * (pages - 1);
+    const target = journeyOffset.get() * height * (pageIds.length - 1);
     group.current.position.y = THREE.MathUtils.damp(
       group.current.position.y,
       target,
@@ -58,39 +46,22 @@ function JourneyScene({
 
   return (
     <group ref={group}>
-      {scenes.map((scene, page) => (
-        <EntryGroup
-          key={scene.id}
-          page={page}
-          height={height}
-          objects={scene.objects}
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
+      {pageIds.map((id, page) => (
+        <group key={id} position={[0, -height * page, 0]}>
+          <EntryScene slug={id} />
+        </group>
       ))}
     </group>
   );
 }
 
-function DetailScene({
-  slug,
-  color,
-  roughness,
-  metalness,
-}: {
-  slug: string;
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
+function DetailScene({ slug }: { slug: string }) {
   const group = useRef<THREE.Group>(null);
   const { height } = useThree((state) => state.viewport);
-  const scene = getScene(slug);
 
   useFrame((_, delta) => {
-    const target = detailScroll.get() * height * 1.05;
     if (!group.current) return;
+    const target = detailScroll.get() * height * 1.05;
     group.current.position.y = THREE.MathUtils.damp(
       group.current.position.y,
       target,
@@ -101,51 +72,8 @@ function DetailScene({
 
   return (
     <group ref={group}>
-      <EntryGroup
-        page={0}
-        height={height}
-        objects={scene.objects}
-        color={color}
-        roughness={roughness}
-        metalness={metalness}
-      />
+      <EntryScene slug={slug} />
     </group>
-  );
-}
-
-function Experience({
-  entradas,
-  detail,
-  slug,
-}: {
-  entradas: EntradaSlide[];
-  detail: boolean;
-  slug: string | null;
-}) {
-  const material = useControls("Material", {
-    color: palette.paper,
-    roughness: { value: 0.62, min: 0, max: 1, step: 0.01 },
-    metalness: { value: 0.06, min: 0, max: 1, step: 0.01 },
-  });
-
-  if (detail && slug) {
-    return (
-      <DetailScene
-        slug={slug}
-        color={material.color}
-        roughness={material.roughness}
-        metalness={material.metalness}
-      />
-    );
-  }
-
-  return (
-    <JourneyScene
-      entradas={entradas}
-      color={material.color}
-      roughness={material.roughness}
-      metalness={material.metalness}
-    />
   );
 }
 
@@ -167,7 +95,11 @@ export default function PersistentCanvas({
     >
       <color attach="background" args={[palette.ink]} />
       <SceneLights />
-      <Experience entradas={entradas} detail={detail} slug={slug} />
+      {detail && slug ? (
+        <DetailScene slug={slug} />
+      ) : (
+        <JourneyScene entradas={entradas} />
+      )}
     </Canvas>
   );
 }
