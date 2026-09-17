@@ -28,8 +28,26 @@ export function InfoPanel({
           Sobre esta bitácora
         </h2>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          Registro de prácticas del curso Robótica y lenguaje audiovisual en
-          CENTRO.
+          Esta bitacora es registro de lo aprendido en la clase Robótica y
+          Lenguaje Audiovisual en CENTRO, esta concendra gran parte del
+          contenido teorico de la clase y el proceso de los proyectos terminales
+          de la clase, con anotaciones y reflexiones propias. Aunque esta
+          bitacora busca tener una estructura lo mas organizada posible, es por
+          eso que hay una entrada por sesion, la redaccion de cada entrada podra
+          o no tener una redaccion lineal. Siempre se buscara redactar con
+          fuentes y datos correctos, si llegas a detectar algun error de
+          narracion o fuente siente con libertar de levantar un PR en el{" "}
+          <a
+            className="underline"
+            href="https://github.com/nestorrig/CENTRO-Robotica-y-Lenguaje-Audiovisual"
+            target="_blank"
+          >
+            repositorio de este blog.
+          </a>{" "}
+          Sin mas, espero que el contenido de este blog te sea de ayuda
+        </p>
+        <p className="mt-3 text-sm leading-6 text-neutral-600">
+          Nestor Rios Garcia @nestorrig
         </p>
         <p className="mt-6 text-[0.7rem] tracking-[0.16em] text-neutral-400 uppercase">
           CENTRO · Tercer semestre

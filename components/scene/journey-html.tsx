@@ -33,8 +33,22 @@ export function JourneyHtml({
       }}
     >
       <section className={slideClass()}>
-        <h1 className="max-w-[11ch] text-[clamp(2.6rem,8vw,5.8rem)] font-bold leading-[0.92] tracking-[-0.05em] text-black">
-          Robótica y Lenguaje Audiovisual
+        <h1
+          aria-label="Robótica y Lenguaje Audiovisual"
+          className="grid w-full grid-cols-2 items-baseline gap-x-[clamp(0.5rem,2vw,1.4rem)] font-didot italic text-[clamp(2.2rem,8vw,5.8rem)] leading-[0.92] tracking-[-0.05em] text-black"
+        >
+          <span className="justify-self-end text-[clamp(3rem,10vw,8rem)] -translate-y-[clamp(1.5rem,2vw,2.5rem)] translate-x-[clamp(1.5rem,2vw,3rem)]">
+            Robótica
+          </span>
+          <span className="justify-self-start text-[clamp(5rem,13vw,12rem)] translate-x-[clamp(3rem,6vw,9rem)]">
+            y
+          </span>
+          <span className="justify-self-end -translate-y-[clamp(0.5rem,2vw,2.5rem)] -translate-x-[clamp(1.5rem,2vw,3rem)]">
+            Lenguaje
+          </span>
+          <span className="justify-self-start translate-y-[clamp(1.8rem,2vw,3.5rem)] -translate-x-[clamp(1.5rem,2vw,3rem)]">
+            Audiovisual
+          </span>
         </h1>
         <div className="absolute bottom-8 left-0 flex w-full flex-col items-center gap-2 text-neutral-500">
           <MouseIcon />
@@ -52,7 +66,7 @@ export function JourneyHtml({
             </p>
             <Link
               href={`/sesiones/${entrada.slug}`}
-              className="block cursor-pointer text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black transition-opacity hover:opacity-55"
+              className="block font-didot italic cursor-pointer text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black transition-opacity hover:opacity-55"
             >
               {entrada.title}
             </Link>
@@ -64,7 +78,7 @@ export function JourneyHtml({
       ))}
 
       <section className={slideClass()}>
-        <h2 className="text-[clamp(2.4rem,7vw,5.2rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
+        <h2 className="font-didot italic text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
           Más muy pronto ...
         </h2>
       </section>

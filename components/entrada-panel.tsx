@@ -37,13 +37,13 @@ export function EntradaPanel({
         <p className="text-[0.7rem] font-medium tracking-[0.32em] text-neutral-500 uppercase">
           Sesión {meta.sesion}
         </p>
-        <h1 className="mt-4 max-w-4xl text-[clamp(2.1rem,6vw,4.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
+        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6vw,4.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
           {meta.title}
         </h1>
         <p className="mt-6 text-sm text-neutral-500">{meta.dateLabel}</p>
       </header>
 
-      <div className="relative mx-auto w-full max-w-3xl bg-white px-6 pt-12 pb-24 sm:px-12">
+      <div className="relative mx-auto mb-24 w-full max-w-3xl bg-white px-6 pt-12 pb-24 sm:px-12">
         <p className="max-w-2xl text-[1.05rem] leading-7 text-neutral-500">
           {meta.excerpt}
         </p>
