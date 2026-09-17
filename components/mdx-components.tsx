@@ -10,11 +10,11 @@ function Nota({
   children: ReactNode;
 }) {
   return (
-    <aside className="not-prose my-10 border border-neutral-200 bg-neutral-50 px-5 py-4 sm:px-6">
-      <p className="text-[0.68rem] tracking-[0.22em] text-neutral-500 uppercase">
+    <aside className="not-prose my-10 border border-ink/15 bg-ink/5 px-5 py-4 sm:px-6">
+      <p className="text-[0.68rem] tracking-[0.22em] text-primary-1 uppercase">
         {titulo}
       </p>
-      <div className="mt-2 text-[1.02rem] leading-7 text-neutral-800 [&_p]:m-0">
+      <div className="mt-2 text-[1.02rem] leading-7 text-ink [&_p]:m-0">
         {children}
       </div>
     </aside>
@@ -31,12 +31,12 @@ function Toma({
   children: ReactNode;
 }) {
   return (
-    <figure className="not-prose my-10 border-l-2 border-black pl-5 sm:pl-6">
-      <figcaption className="text-[0.68rem] tracking-[0.22em] text-neutral-500 uppercase">
+    <figure className="not-prose my-10 border-l-2 border-primary-1 pl-5 sm:pl-6">
+      <figcaption className="text-[0.68rem] tracking-[0.22em] text-primary-1 uppercase">
         Toma {numero}
         {lugar ? ` · ${lugar}` : ""}
       </figcaption>
-      <div className="mt-2 text-[1.15rem] leading-8 text-neutral-800 italic [&_p]:m-0">
+      <div className="mt-2 text-[1.15rem] leading-8 text-ink italic [&_p]:m-0">
         {children}
       </div>
     </figure>
@@ -46,11 +46,11 @@ function Toma({
 function Cita({ autor, children }: { autor?: string; children: ReactNode }) {
   return (
     <blockquote className="not-prose my-12">
-      <div className="text-[1.4rem] leading-snug tracking-[-0.02em] text-black sm:text-[1.65rem] [&_p]:m-0">
+      <div className="text-[1.4rem] leading-snug tracking-[-0.02em] text-ink sm:text-[1.65rem] [&_p]:m-0">
         {children}
       </div>
       {autor ? (
-        <footer className="mt-3 text-[0.72rem] tracking-[0.18em] text-neutral-500 uppercase">
+        <footer className="mt-3 text-[0.72rem] tracking-[0.18em] text-ink/50 uppercase">
           — {autor}
         </footer>
       ) : null}
@@ -68,18 +68,18 @@ function Definicion({
   children: ReactNode;
 }) {
   return (
-    <figure className="not-prose my-10 border-y border-neutral-200 p-6 bg-neutral-50">
-      <figcaption className="text-[0.68rem] tracking-[0.22em] text-neutral-500 uppercase">
+    <figure className="not-prose my-10 border-y border-ink/15 bg-ink/5 p-6">
+      <figcaption className="text-[0.68rem] tracking-[0.22em] text-primary-1 uppercase">
         Definición
       </figcaption>
       <dl className="mt-2">
-        <dt className="font-didot text-[1.85rem] leading-tight tracking-[-0.03em] text-black italic">
+        <dt className="font-didot text-[1.85rem] leading-tight tracking-[-0.03em] text-ink italic">
           {termino}
         </dt>
-        <dd className="mt-3 leading-7 text-neutral-800 [&_p]:m-0">
+        <dd className="mt-3 leading-7 text-ink [&_p]:m-0">
           {children}
           {fuente ? (
-            <p className="mt-3 text-[0.72rem] tracking-[0.18em] text-neutral-500 uppercase">
+            <p className="mt-3 text-[0.72rem] tracking-[0.18em] text-ink/50 uppercase">
               {fuente}
             </p>
           ) : null}
@@ -99,25 +99,25 @@ export const mdxComponents: MDXComponents = {
   Imagen,
   h2: (props) => (
     <h2
-      className="font-didot-headline  mt-12 mb-4 text-[1.55rem] leading-tight font-semibold tracking-[-0.02em] text-black"
+      className="font-didot-headline  mt-12 mb-4 text-[1.55rem] leading-tight font-semibold tracking-[-0.02em] text-ink"
       {...props}
     />
   ),
   h3: (props) => (
     <h3
-      className="font-didot italic mt-8 mb-3 text-[1.2rem] leading-snug font-semibold text-black"
+      className="font-didot italic mt-8 mb-3 text-[1.2rem] leading-snug font-semibold text-ink"
       {...props}
     />
   ),
   p: (props) => (
     <p
-      className="my-[1.15em] text-base leading-[1.75] text-neutral-800"
+      className="my-[1.15em] text-base leading-[1.75] text-ink"
       {...props}
     />
   ),
   a: (props) => (
     <a
-      className="underline decoration-neutral-400 underline-offset-4 hover:decoration-black"
+      className="underline decoration-primary-1 underline-offset-4 hover:decoration-primary-2"
       {...props}
     />
   ),
@@ -135,14 +135,14 @@ export const mdxComponents: MDXComponents = {
   em: (props) => <em className="italic" {...props} />,
   code: (props) => (
     <code
-      className="rounded-sm bg-neutral-100 px-1 py-0.5 font-mono text-[0.85em]"
+      className="rounded-sm bg-ink/8 px-1 py-0.5 font-mono text-[0.85em]"
       {...props}
     />
   ),
-  hr: () => <hr className="my-12 border-neutral-200" />,
+  hr: () => <hr className="my-12 border-ink/15" />,
   blockquote: (props) => (
     <blockquote
-      className="my-8 border-l-2 border-neutral-300 pl-5 text-neutral-500 italic"
+      className="my-8 border-l-2 border-primary-1 pl-5 text-ink/60 italic"
       {...props}
     />
   ),

@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ececec;
-  --paper: #ffffff;
-  --ink: #111111;
-  --muted: #737373;
-  --accent: #111111;
-  --line: #e5e5e5;
-  --foreground: var(--ink);
+  --ink: #260000;
+  --paper: #f4f4f4;
+  --primary-1: #8c1027;
+  --primary-2: #da232f;
+  --accent: #fbdb6d;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-primary-1: var(--primary-1);
+  --color-primary-2: var(--primary-2);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: "linotype-didot", serif;
@@ -24,8 +25,8 @@ html,
 body {
   height: 100%;
   overflow: hidden;
-  background: var(--background);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .bitacora-canvas div::-webkit-scrollbar,
@@ -46,6 +47,6 @@ body {
 }
 
 ::selection {
-  background: #111111;
-  color: #ffffff;
+  background: var(--primary-2);
+  color: var(--paper);
 }

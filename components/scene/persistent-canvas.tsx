@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { EntryGroup } from "@/components/scene/entry-group";
 import { getJourneyScenes, getScene } from "@/components/scene/scenes";
 import { detailScroll, journeyOffset } from "@/lib/journey-store";
+import { palette } from "@/lib/palette";
 import type { EntradaSlide } from "@/lib/types";
 
 function SceneLights() {
@@ -122,7 +123,7 @@ function Experience({
   slug: string | null;
 }) {
   const material = useControls("Material", {
-    color: "#c5c5c5",
+    color: palette.paper,
     roughness: { value: 0.62, min: 0, max: 1, step: 0.01 },
     metalness: { value: 0.06, min: 0, max: 1, step: 0.01 },
   });
@@ -164,7 +165,7 @@ export default function PersistentCanvas({
       gl={{ antialias: true, alpha: false }}
       camera={{ position: [0, 0, 8], fov: 38, near: 0.1, far: 40 }}
     >
-      <color attach="background" args={["#ececec"]} />
+      <color attach="background" args={[palette.ink]} />
       <SceneLights />
       <Experience entradas={entradas} detail={detail} slug={slug} />
     </Canvas>

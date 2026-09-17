@@ -18,7 +18,7 @@ export function InfoPanel({
         />
       ) : null}
       <aside
-        className={`fixed top-16 right-5 z-40 w-[min(20rem,calc(100vw-2.5rem))] border border-neutral-300 bg-white/95 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)] backdrop-blur-sm transition-all duration-300 sm:right-7 ${
+        className={`fixed top-16 right-5 z-40 w-[min(20rem,calc(100vw-2.5rem))] border border-paper/20 bg-paper p-5 text-ink shadow-[0_12px_40px_rgba(38,0,0,0.18)] backdrop-blur-sm transition-all duration-300 sm:right-7 ${
           open
             ? "translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
@@ -27,7 +27,7 @@ export function InfoPanel({
         <h2 className="font-didot-headline text-lg font-semibold tracking-tight">
           Sobre esta bitácora
         </h2>
-        <p className="mt-3 text-sm leading-6 text-neutral-600">
+        <p className="mt-3 text-sm leading-6 text-ink/70">
           Esta bitácora es registro de lo aprendido en la clase Robótica y
           Lenguaje Audiovisual en CENTRO, esta contendrá gran parte del
           contenido teórico de la clase y el proceso de los proyectos terminales
@@ -38,7 +38,7 @@ export function InfoPanel({
           fuentes y datos correctos, si llegas a detectar algún error de
           narración o fuente siéntete con libertad de levantar un PR en el{" "}
           <a
-            className="underline"
+            className="underline decoration-primary-1 underline-offset-4 hover:decoration-primary-2"
             href="https://github.com/nestorrig/CENTRO-Robotica-y-Lenguaje-Audiovisual"
             target="_blank"
           >
@@ -46,10 +46,10 @@ export function InfoPanel({
           </a>{" "}
           Sin más, espero que el contenido de este blog te sea de ayuda.
         </p>
-        <p className="mt-3 text-sm leading-6 text-neutral-600">
+        <p className="mt-3 text-sm leading-6 text-ink/70">
           Nestor Rios Garcia @nestorrig
         </p>
-        <p className="mt-6 text-[0.7rem] tracking-[0.16em] text-neutral-400 uppercase">
+        <p className="mt-6 text-[0.7rem] tracking-[0.16em] text-ink/40 uppercase">
           CENTRO · Tercer semestre
         </p>
       </aside>

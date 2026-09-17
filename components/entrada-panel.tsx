@@ -34,28 +34,28 @@ export function EntradaPanel({
       }}
     >
       <header className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <p className="text-[0.7rem] font-medium tracking-[0.32em] text-neutral-500 uppercase">
+        <p className="text-[0.7rem] font-medium tracking-[0.32em] text-paper/55 uppercase">
           Sesión {meta.sesion}
         </p>
-        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
+        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-paper">
           {meta.title}
         </h1>
-        <p className="mt-6 text-sm text-neutral-500">{meta.dateLabel}</p>
+        <p className="mt-6 text-sm text-paper/55">{meta.dateLabel}</p>
       </header>
 
-      <div className="relative mx-auto mb-24 w-full max-w-3xl bg-white px-6 pt-12 pb-24 sm:px-12">
-        <p className="max-w-2xl text-[1.05rem] leading-7 text-neutral-500">
+      <div className="relative mx-auto mb-24 w-full max-w-3xl bg-paper px-6 pt-12 pb-24 text-ink sm:px-12">
+        <p className="max-w-2xl text-[1.05rem] leading-7 text-ink/55">
           {meta.excerpt}
         </p>
         <article className="max-w-2xl pt-2">{children}</article>
 
-        <nav className="mt-16 grid gap-8 border-t border-neutral-200 pt-8 sm:grid-cols-2">
+        <nav className="mt-16 grid gap-8 border-t border-ink/15 pt-8 sm:grid-cols-2">
           {anterior ? (
             <Link href={`/sesiones/${anterior.slug}`} className="group">
-              <p className=" text-[0.65rem] tracking-[0.2em] text-neutral-400 uppercase">
+              <p className="text-[0.65rem] tracking-[0.2em] text-ink/40 uppercase">
                 ← Sesión {anterior.sesion}
               </p>
-              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
+              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:text-primary-1">
                 {anterior.title}
               </p>
             </Link>
@@ -67,10 +67,10 @@ export function EntradaPanel({
               href={`/sesiones/${siguiente.slug}`}
               className="group sm:text-right"
             >
-              <p className="text-[0.65rem] tracking-[0.2em] text-neutral-400 uppercase">
+              <p className="text-[0.65rem] tracking-[0.2em] text-ink/40 uppercase">
                 Sesión {siguiente.sesion} →
               </p>
-              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
+              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:text-primary-1">
                 {siguiente.title}
               </p>
             </Link>

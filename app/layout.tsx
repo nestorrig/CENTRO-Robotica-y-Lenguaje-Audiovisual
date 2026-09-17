@@ -37,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/gmw1cry.css" />
       </head>
-      <body className="h-full overflow-hidden bg-[#ececec] font-sans text-black">
+      <body className="h-full overflow-hidden bg-ink font-sans text-paper">
         <SceneShell entradas={entradas}>{children}</SceneShell>
       </body>
     </html>

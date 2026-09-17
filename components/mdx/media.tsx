@@ -9,9 +9,9 @@ function MediaFigure({
 }) {
   return (
     <figure className="not-prose my-10">
-      <div className="overflow-hidden bg-neutral-100">{children}</div>
+      <div className="overflow-hidden bg-ink/8">{children}</div>
       {pie ? (
-        <figcaption className="mt-3 text-[0.68rem] leading-5 tracking-[0.22em] text-neutral-500 uppercase [&_p]:m-0">
+        <figcaption className="mt-3 text-[0.68rem] leading-5 tracking-[0.22em] text-ink/50 uppercase [&_p]:m-0">
           {pie}
         </figcaption>
       ) : null}
@@ -78,7 +78,7 @@ export function YouTube({
 
   if (!videoId) {
     return (
-      <p className="not-prose my-10 text-sm text-neutral-500">
+      <p className="not-prose my-10 text-sm text-ink/50">
         No se pudo leer el enlace de YouTube.
       </p>
     );

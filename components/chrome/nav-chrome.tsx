@@ -14,7 +14,7 @@ export function NavChrome({
       <Link
         href="/"
         aria-label="Inicio"
-        className="pointer-events-auto text-black transition-opacity hover:opacity-50"
+        className="pointer-events-auto text-paper transition-opacity hover:opacity-50"
       >
         <HomeIcon />
       </Link>
@@ -23,7 +23,7 @@ export function NavChrome({
         aria-label={infoOpen ? "Cerrar información" : "Abrir información"}
         aria-expanded={infoOpen}
         onClick={onToggleInfo}
-        className="pointer-events-auto text-black transition-opacity hover:opacity-50"
+        className="pointer-events-auto text-paper transition-opacity hover:opacity-50"
       >
         <InfoIcon />
       </button>
