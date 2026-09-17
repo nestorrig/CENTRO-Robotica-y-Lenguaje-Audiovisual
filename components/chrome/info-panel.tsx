@@ -24,19 +24,19 @@ export function InfoPanel({
             : "pointer-events-none -translate-y-2 opacity-0"
         }`}
       >
-        <h2 className="text-lg font-semibold tracking-tight">
+        <h2 className="font-didot-headline text-lg font-semibold tracking-tight">
           Sobre esta bitácora
         </h2>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          Esta bitacora es registro de lo aprendido en la clase Robótica y
-          Lenguaje Audiovisual en CENTRO, esta concendra gran parte del
-          contenido teorico de la clase y el proceso de los proyectos terminales
+          Esta bitácora es registro de lo aprendido en la clase Robótica y
+          Lenguaje Audiovisual en CENTRO, esta contendrá gran parte del
+          contenido teórico de la clase y el proceso de los proyectos terminales
           de la clase, con anotaciones y reflexiones propias. Aunque esta
-          bitacora busca tener una estructura lo mas organizada posible, es por
-          eso que hay una entrada por sesion, la redaccion de cada entrada podra
-          o no tener una redaccion lineal. Siempre se buscara redactar con
-          fuentes y datos correctos, si llegas a detectar algun error de
-          narracion o fuente siente con libertar de levantar un PR en el{" "}
+          bitácora busca tener una estructura lo más organizada posible, es por
+          eso que hay una entrada por sesión, la redacción de cada entrada podrá
+          o no tener una redacción lineal. Siempre se buscará redactar con
+          fuentes y datos correctos, si llegas a detectar algún error de
+          narración o fuente siéntete con libertad de levantar un PR en el{" "}
           <a
             className="underline"
             href="https://github.com/nestorrig/CENTRO-Robotica-y-Lenguaje-Audiovisual"
@@ -44,7 +44,7 @@ export function InfoPanel({
           >
             repositorio de este blog.
           </a>{" "}
-          Sin mas, espero que el contenido de este blog te sea de ayuda
+          Sin más, espero que el contenido de este blog te sea de ayuda.
         </p>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
           Nestor Rios Garcia @nestorrig
