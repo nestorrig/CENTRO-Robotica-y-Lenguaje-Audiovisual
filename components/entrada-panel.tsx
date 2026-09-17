@@ -37,7 +37,7 @@ export function EntradaPanel({
         <p className="text-[0.7rem] font-medium tracking-[0.32em] text-paper/55 uppercase">
           Sesión {meta.sesion}
         </p>
-        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-paper">
+        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(3rem,6.4vw,6.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-paper">
           {meta.title}
         </h1>
         <p className="mt-6 text-sm text-paper/55">{meta.dateLabel}</p>

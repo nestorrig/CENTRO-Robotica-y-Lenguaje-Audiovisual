@@ -105,15 +105,12 @@ export const mdxComponents: MDXComponents = {
   ),
   h3: (props) => (
     <h3
-      className="font-didot italic mt-8 mb-3 text-[1.2rem] leading-snug font-semibold text-ink"
+      className="font-didot-headline mt-8 mb-3 text-[1.2rem] leading-snug font-semibold text-ink"
       {...props}
     />
   ),
   p: (props) => (
-    <p
-      className="my-[1.15em] text-base leading-[1.75] text-ink"
-      {...props}
-    />
+    <p className="my-[1.15em] text-base leading-[1.75] text-ink" {...props} />
   ),
   a: (props) => (
     <a

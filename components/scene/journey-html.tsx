@@ -35,18 +35,18 @@ export function JourneyHtml({
       <section className={slideClass()}>
         <h1
           aria-label="Robótica y Lenguaje Audiovisual"
-          className="grid w-full grid-cols-2 items-baseline gap-x-[clamp(0.5rem,2vw,1.4rem)] font-didot italic text-[clamp(2.2rem,8vw,5.8rem)] leading-[0.92] tracking-tighter text-accent"
+          className="grid pb-[12vh] lg:pl-[5vw] w-full grid-cols-2 items-baseline gap-x-[clamp(0.5rem,2vw,1.4rem)] font-didot italic text-[clamp(2.5rem,8vw,6.5rem)] leading-[0.92] tracking-tighter text-accent"
         >
-          <span className="justify-self-end text-[clamp(3rem,10vw,8rem)] -translate-y-[clamp(1.5rem,2vw,2.5rem)] translate-x-[clamp(1.5rem,2vw,3rem)]">
+          <span className="justify-self-end text-[clamp(3rem,12vw,10rem)] -translate-y-[clamp(1.5rem,2vw,2.5rem)] translate-x-[clamp(1.5rem,2vw,3rem)]">
             Robótica
           </span>
-          <span className="justify-self-start text-[clamp(5rem,13vw,12rem)] translate-x-[clamp(3rem,6vw,9rem)]">
+          <span className="justify-self-start text-[clamp(5rem,15vw,14rem)] translate-x-[clamp(2rem,6vw,9rem)]">
             y
           </span>
-          <span className="justify-self-end -translate-y-[clamp(0.5rem,2vw,2.5rem)] -translate-x-[clamp(1.5rem,2vw,3rem)]">
+          <span className="justify-self-end -translate-y-[clamp(0.5rem,2vw,2.5rem)] -translate-x-[clamp(1rem,2vw,3rem)]">
             Lenguaje
           </span>
-          <span className="justify-self-start translate-y-[clamp(1.8rem,2vw,3.5rem)] -translate-x-[clamp(1.5rem,2vw,3rem)]">
+          <span className="justify-self-start translate-y-[clamp(1.8rem,2vw,3.5rem)] -translate-x-[clamp(1rem,2vw,3rem)]">
             Audiovisual
           </span>
         </h1>
@@ -66,7 +66,7 @@ export function JourneyHtml({
             </p>
             <Link
               href={`/sesiones/${entrada.slug}`}
-              className="block font-didot italic cursor-pointer text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-paper transition-opacity hover:text-accent"
+              className="block font-didot italic cursor-pointer text-[clamp(3rem,6.4vw,6.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-paper transition-opacity hover:text-accent"
             >
               {entrada.title}
             </Link>
