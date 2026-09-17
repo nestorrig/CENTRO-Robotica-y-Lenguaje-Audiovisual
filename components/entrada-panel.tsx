@@ -37,7 +37,7 @@ export function EntradaPanel({
         <p className="text-[0.7rem] font-medium tracking-[0.32em] text-neutral-500 uppercase">
           Sesión {meta.sesion}
         </p>
-        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6vw,4.4rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
+        <h1 className="font-didot italic mt-4 max-w-4xl text-[clamp(2.1rem,6.4vw,4.6rem)] font-bold leading-[0.95] tracking-[-0.045em] text-black">
           {meta.title}
         </h1>
         <p className="mt-6 text-sm text-neutral-500">{meta.dateLabel}</p>
@@ -52,10 +52,10 @@ export function EntradaPanel({
         <nav className="mt-16 grid gap-8 border-t border-neutral-200 pt-8 sm:grid-cols-2">
           {anterior ? (
             <Link href={`/sesiones/${anterior.slug}`} className="group">
-              <p className="text-[0.65rem] tracking-[0.2em] text-neutral-400 uppercase">
+              <p className=" text-[0.65rem] tracking-[0.2em] text-neutral-400 uppercase">
                 ← Sesión {anterior.sesion}
               </p>
-              <p className="mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
+              <p className="font-didot italic mt-2 text-lg font-semibold tracking-tight group-hover:opacity-50">
                 {anterior.title}
               </p>
             </Link>

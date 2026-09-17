@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SceneShell } from "@/components/scene/scene-shell";
-import { formatFecha, getAllEntradas } from "@/lib/entradas";
+import { formatFecha, getVisibleEntradas } from "@/lib/entradas";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  const entradas = getAllEntradas().map((entrada) => ({
+  const entradas = getVisibleEntradas().map((entrada) => ({
     ...entrada,
     dateLabel: formatFecha(entrada.date),
   }));

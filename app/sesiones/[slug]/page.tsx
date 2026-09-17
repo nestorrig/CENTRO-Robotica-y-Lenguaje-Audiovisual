@@ -3,9 +3,8 @@ import { notFound } from "next/navigation";
 import { EntradaPanel } from "@/components/entrada-panel";
 import {
   formatFecha,
-  getAllEntradas,
   getEntrada,
-  getEntradaSlugs,
+  getVisibleEntradas,
 } from "@/lib/entradas";
 
 type Props = {
@@ -17,14 +16,14 @@ function withDateLabel<T extends { date: string }>(item: T) {
 }
 
 export function generateStaticParams() {
-  return getEntradaSlugs().map((slug) => ({ slug }));
+  return getVisibleEntradas().map((entrada) => ({ slug: entrada.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const entrada = await getEntrada(slug);
 
-  if (!entrada) {
+  if (!entrada || !getVisibleEntradas().some((item) => item.slug === slug)) {
     return { title: "Entrada no encontrada" };
   }
 
@@ -37,11 +36,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EntradaPage({ params }: Props) {
   const { slug } = await params;
   const entrada = await getEntrada(slug);
+  const todas = getVisibleEntradas();
 
-  if (!entrada) notFound();
+  if (!entrada || !todas.some((item) => item.slug === slug)) notFound();
 
   const { meta, content } = entrada;
-  const todas = getAllEntradas();
   const index = todas.findIndex((item) => item.slug === slug);
   const anterior = index > 0 ? todas[index - 1] : null;
   const siguiente = index < todas.length - 1 ? todas[index + 1] : null;

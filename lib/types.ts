@@ -6,4 +6,5 @@ export type EntradaSlide = {
   dateLabel: string;
   sesion: number;
   tags: string[];
+  published: boolean;
 };

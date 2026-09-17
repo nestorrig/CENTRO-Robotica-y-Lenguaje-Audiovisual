@@ -6,6 +6,9 @@ import { mdxComponents } from "@/components/mdx-components";
 
 const CONTENT_DIR = path.join(process.cwd(), "content/entradas");
 
+/** En desarrollo: `true` muestra borradores. `false` deja solo las publicadas. En producción no aplica. */
+export const SHOW_DRAFTS = true;
+
 export type EntradaMeta = {
   slug: string;
   title: string;
@@ -13,13 +16,14 @@ export type EntradaMeta = {
   date: string;
   sesion: number;
   tags: string[];
+  published: boolean;
 };
 
 function assertMeta(
   data: Record<string, unknown>,
   slug: string,
 ): Omit<EntradaMeta, "slug"> {
-  const { title, excerpt, date, sesion, tags } = data;
+  const { title, excerpt, date, sesion, tags, published } = data;
   const sesionNumero = Number(sesion);
 
   if (
@@ -27,7 +31,8 @@ function assertMeta(
     typeof excerpt !== "string" ||
     typeof date !== "string" ||
     Number.isNaN(sesionNumero) ||
-    !Array.isArray(tags)
+    !Array.isArray(tags) ||
+    typeof published !== "boolean"
   ) {
     throw new Error(`Frontmatter incompleto en ${slug}.mdx`);
   }
@@ -38,7 +43,12 @@ function assertMeta(
     date,
     sesion: sesionNumero,
     tags: tags.map(String),
+    published,
   };
+}
+
+function includeDrafts() {
+  return process.env.NODE_ENV === "development" && SHOW_DRAFTS;
 }
 
 export function getEntradaSlugs() {
@@ -61,6 +71,11 @@ export function getAllEntradas(): EntradaMeta[] {
       return { slug, ...assertMeta(data, slug) };
     })
     .sort((a, b) => a.sesion - b.sesion);
+}
+
+export function getVisibleEntradas(): EntradaMeta[] {
+  const drafts = includeDrafts();
+  return getAllEntradas().filter((entrada) => entrada.published || drafts);
 }
 
 export async function getEntrada(slug: string) {
