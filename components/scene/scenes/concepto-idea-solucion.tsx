@@ -1,59 +1,174 @@
 "use client";
 
-import { SpinGroup } from "@/components/scene/spin-group";
 import { palette } from "@/lib/palette";
 
-export function ConceptoIdeaSolucionScene() {
+import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import * as THREE from "three";
+import CustomShaderMaterial from "three-custom-shader-material";
+import type CustomShaderMaterialType from "three-custom-shader-material/vanilla";
+import { cameraDistance } from "../persistent-canvas";
+
+const MAX_STRIPE_COLORS = 8;
+
+const BAND_COLORS = [
+  new THREE.Color(palette.primary1),
+  new THREE.Color(palette.primary2),
+  new THREE.Color(palette.accent),
+];
+
+const AXIS = {
+  x: new THREE.Vector3(1, 0, 0),
+  y: new THREE.Vector3(0, 1, 0),
+  z: new THREE.Vector3(0, 0, 1),
+} as const;
+
+const stripesVertexShader = /* glsl */ `
+  varying vec3 vLocalPosition;
+  // varying vec3 vWorldPosition;
+
+  void main() {
+    // vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    vLocalPosition = position;
+  }
+`;
+
+const stripesFragmentShader = /* glsl */ `
+  varying vec3 vLocalPosition;
+  // varying vec3 vWorldPosition;
+  uniform float uTime;
+  uniform float uPositionFrequency;
+  uniform float uTimeFrequency;
+  uniform float uColorsLength;
+  uniform float uColorsOffset;
+  uniform vec3 uAxis;
+  uniform vec3 uColors[8];
+
+  void main() {
+    float along = dot(vLocalPosition, uAxis);
+    float pattern = fract(along * uPositionFrequency - uTime * uTimeFrequency);
+    int last = int(uColorsLength) - 1;
+    int index = clamp(int(floor(pattern * (uColorsLength + uColorsOffset))), 0, last);
+    csm_DiffuseColor = vec4(uColors[index], 1.0);
+  }
+`;
+
+function padColors(colors: THREE.Color[]) {
+  const used = colors.slice(0, MAX_STRIPE_COLORS);
+  const last = used[used.length - 1] ?? new THREE.Color(0xffffff);
+  return Array.from({ length: MAX_STRIPE_COLORS }, (_, i) => used[i] ?? last);
+}
+
+function StripeMaterial({
+  colors = BAND_COLORS,
+  uColorsOffset = 1,
+  axis = "x",
+  positionFrequency = 1.5,
+  timeFrequency = 0.35,
+}: {
+  colors?: THREE.Color[];
+  uColorsOffset?: number;
+  axis?: keyof typeof AXIS;
+  positionFrequency?: number;
+  timeFrequency?: number;
+}) {
+  const materialRef =
+    useRef<CustomShaderMaterialType<typeof THREE.MeshStandardMaterial>>(null);
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uPositionFrequency: { value: positionFrequency },
+      uTimeFrequency: { value: timeFrequency },
+      uColorsLength: { value: Math.min(colors.length, MAX_STRIPE_COLORS) },
+      uColorsOffset: { value: uColorsOffset },
+      uAxis: { value: AXIS[axis].clone() },
+      uColors: { value: padColors(colors) },
+    }),
+    [axis, colors, positionFrequency, timeFrequency, uColorsOffset],
+  );
+
+  useFrame((state) => {
+    const material = materialRef.current;
+    if (!material) return;
+    material.uniforms.uTime.value = state.clock.elapsedTime;
+  });
+
   return (
-    <>
-      <SpinGroup
-        position={[-1.75, -0.05, 0.15]}
-        rotation={[0.35, 0.7, 0.12]}
-        scale={1}
-        spin={0.1}
-        float={0.12}
-      >
-        <mesh>
-          <boxGeometry args={[1.35, 1.35, 1.35]} />
-          <meshStandardMaterial
-            color={palette.primary1}
-            roughness={0.7}
-            metalness={0.85}
-          />
-        </mesh>
-      </SpinGroup>
-      <SpinGroup
-        position={[1.55, -0.4, -0.35]}
-        rotation={[1.05, 0.15, 0.2]}
-        scale={1.15}
-        spin={0.06}
-        float={0.08}
-      >
-        <mesh>
-          <cylinderGeometry args={[1.15, 1.15, 0.22, 64]} />
-          <meshStandardMaterial
-            color={palette.primary2}
-            roughness={0.65}
-            metalness={0.7}
-          />
-        </mesh>
-      </SpinGroup>
-      <SpinGroup
-        position={[0.4, 1.2, -0.75]}
-        rotation={[-0.15, 0.45, 0.1]}
-        scale={1}
-        spin={0.12}
-        float={0.1}
-      >
-        <mesh>
-          <coneGeometry args={[0.85, 1.55, 4]} />
-          <meshStandardMaterial
-            color={palette.accent}
-            roughness={0.5}
-            metalness={0.35}
-          />
-        </mesh>
-      </SpinGroup>
-    </>
+    <CustomShaderMaterial
+      ref={materialRef}
+      baseMaterial={THREE.MeshStandardMaterial}
+      vertexShader={stripesVertexShader}
+      fragmentShader={stripesFragmentShader}
+      uniforms={uniforms}
+      roughness={0.1}
+      metalness={0.2}
+    />
+  );
+}
+
+const sphereGeometry = new THREE.SphereGeometry(1, 56, 48);
+
+export function ConceptoIdeaSolucionScene() {
+  const ballsGroupRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    const ballsGroup = ballsGroupRef.current;
+    if (!ballsGroup) return;
+
+    const items = ballsGroup.children.length;
+    const radius = Math.max(
+      cameraDistance(window.innerWidth / window.innerHeight) * 0.18,
+      1.7,
+    );
+    console.log(radius);
+
+    ballsGroup.children.forEach((child, i) => {
+      console.log(child);
+
+      const angle = Math.PI / 2 + ((Math.PI * 2) / items) * i;
+      child.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+    });
+  }, []);
+
+  useFrame((state) => {
+    const ballsGroup = ballsGroupRef.current;
+    if (!ballsGroup) return;
+
+    const elapsedTime = state.clock.elapsedTime;
+    ballsGroup.rotation.y = elapsedTime * 0.55;
+    ballsGroup.rotation.x = elapsedTime * 0.15;
+    ballsGroup.rotation.z = elapsedTime * 0.35;
+  });
+
+  return (
+    <group ref={ballsGroupRef}>
+      <mesh position={[0, 0, 0]} geometry={sphereGeometry}>
+        <StripeMaterial
+          axis="y"
+          colors={[
+            new THREE.Color(palette.primary1),
+            new THREE.Color(palette.accent),
+            new THREE.Color(palette.primary2),
+          ]}
+          uColorsOffset={1}
+        />
+      </mesh>
+
+      <mesh position={[0, 0, 0]} geometry={sphereGeometry}>
+        <StripeMaterial
+          axis="z"
+          colors={[
+            new THREE.Color(palette.accent),
+            new THREE.Color(palette.primary2),
+            new THREE.Color(palette.primary1),
+          ]}
+          uColorsOffset={4}
+        />
+      </mesh>
+
+      <mesh position={[0, 0, 0]} geometry={sphereGeometry}>
+        <StripeMaterial axis="x" colors={BAND_COLORS} uColorsOffset={6} />
+      </mesh>
+    </group>
   );
 }

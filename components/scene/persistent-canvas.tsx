@@ -12,7 +12,7 @@ import type { EntradaSlide } from "@/lib/types";
 const CAMERA_FOV = 38;
 const DESKTOP_Z = 8;
 
-function cameraDistance(aspect: number) {
+export function cameraDistance(aspect: number) {
   const desktopAspect = 16 / 9;
   return THREE.MathUtils.clamp(
     DESKTOP_Z * (desktopAspect / Math.max(aspect, 0.35)),
