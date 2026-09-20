@@ -100,7 +100,7 @@ function StripeMaterial({
       vertexShader={stripesVertexShader}
       fragmentShader={stripesFragmentShader}
       uniforms={uniforms}
-      roughness={0.1}
+      roughness={0.16}
       metalness={0.2}
     />
   );

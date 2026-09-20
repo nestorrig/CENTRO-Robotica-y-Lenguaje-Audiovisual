@@ -8,6 +8,7 @@ import { EntryScene, getJourneyPageIds } from "@/components/scene/registry";
 import { detailScroll, journeyOffset } from "@/lib/journey-store";
 import { palette } from "@/lib/palette";
 import type { EntradaSlide } from "@/lib/types";
+import { Environment, Lightformer } from "@react-three/drei";
 
 const CAMERA_FOV = 38;
 const DESKTOP_Z = 8;
@@ -61,6 +62,14 @@ function SceneLights() {
       <ambientLight intensity={ambient} />
       <directionalLight position={[4.5, 6, 5]} intensity={key} />
       <directionalLight position={[-5, -1.5, 3]} intensity={fill} />
+      <Environment>
+        <Lightformer
+          color={palette.accent}
+          position={[0, 0, -1]}
+          scale={5}
+          intensity={2}
+        />
+      </Environment>
     </>
   );
 }
