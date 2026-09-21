@@ -16,18 +16,49 @@ const geistMono = Geist_Mono({
 
 const siteTitle = "Bitácora · Robótica y lenguaje audiovisual";
 const siteDescription =
-  "Registro vivo del curso Robótica y lenguaje audiovisual en CENTRO: teoría, proceso de los proyectos terminales y reflexiones. Se actualiza sesión a sesión.";
+  "Registro vivo del curso Robótica y lenguaje audiovisual en CENTRO Diseño, Cine y Televisión: teoría, proceso de los proyectos terminales y reflexiones. Se actualiza sesión a sesión.";
 
 export const metadata: Metadata = {
+  //* Metadata base
+  metadataBase: new URL(
+    "https://robotica-y-lenguaje-audiovisual.nestorrig.com",
+  ),
   title: {
     default: siteTitle,
     template: "%s · Bitácora",
   },
+
+  keywords: [
+    "robotica",
+    "lenguaje audiovisual",
+    "CENTRO Diseño, Cine y Televisión",
+    "proyectos terminales",
+    "camara estenopeica",
+    "lenguaje cinematografico",
+    "maquina de animacion",
+    "reflexiones",
+    "sesión a sesión",
+    "bitácora",
+    "blog",
+    "Three.js",
+    "React Three Fiber",
+    "Next.js",
+    "WebGL",
+    "3D Interactive",
+    "Custom Shader Material",
+    "Shaders",
+    "GSAP",
+  ],
   description: siteDescription,
+  authors: [{ name: "Nestor Rios Garcia" }],
+  creator: "Nestor Rios Garcia",
+
+  //* Open Graph
   openGraph: {
     title: siteTitle,
     description: siteDescription,
     locale: "es_MX",
+    url: "https://robotica-y-lenguaje-audiovisual.nestorrig.com/",
     type: "website",
     images: [
       {
@@ -38,11 +69,19 @@ export const metadata: Metadata = {
       },
     ],
   },
+
+  //* Twitter
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
     images: ["/img/cover.png"],
+  },
+
+  //* Indexación para buscadores
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
