@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bitácora · Robótica y lenguaje audiovisual
 
-## Getting Started
+![Robótica y Lenguaje Audiovisual](public/img/cover.png)
 
-First, run the development server:
+Registro del curso **Robótica y lenguaje audiovisual** en [CENTRO](https://centro.edu.mx/), tercer semestre. No es un recetario cerrado ni un sitio institucional: es una bitácora personal que documenta lo que se ve en clase, el proceso de los proyectos terminales y las reflexiones que van quedando entre una sesión y la siguiente.
+
+## Propósito
+
+Cada entrada corresponde a una sesión. Ahí conviven teoría, referencias, ejercicios y notas propias. La redacción no siempre es lineal a propósito: importa más dejar constancia del pensamiento en el momento que forzar un ensayo pulido.
+
+El archivo se actualiza de manera recurrente a lo largo del semestre. Irán apareciendo sesiones nuevas, correcciones y capas sobre lo ya publicado. Si encuentras un error de narración o de fuente, puedes abrir un pull request en este repositorio.
+
+Nestor Rios Garcia ([@nestorrig](https://github.com/nestorrig))
+
+## Cómo está hecha
+
+Sitio web con una escena 3D de fondo y las entradas escritas en Markdown. El contenido vive aparte de la interfaz, para poder sumar o editar sesiones sin reconstruir el resto.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Abre [http://localhost:3000](http://localhost:3000).

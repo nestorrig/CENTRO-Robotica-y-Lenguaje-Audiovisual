@@ -14,13 +14,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteTitle = "Bitácora · Robótica y lenguaje audiovisual";
+const siteDescription =
+  "Registro vivo del curso Robótica y lenguaje audiovisual en CENTRO: teoría, proceso de los proyectos terminales y reflexiones. Se actualiza sesión a sesión.";
+
 export const metadata: Metadata = {
   title: {
-    default: "Bitácora · Robótica y lenguaje audiovisual",
+    default: siteTitle,
     template: "%s · Bitácora",
   },
-  description:
-    "Registro de prácticas del curso Robótica y lenguaje audiovisual. Cinco sesiones sobre máquina, cuerpo y encuadre.",
+  description: siteDescription,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    locale: "es_MX",
+    type: "website",
+    images: [
+      {
+        url: "/img/cover.png",
+        width: 1200,
+        height: 630,
+        alt: "Robótica y Lenguaje Audiovisual",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/img/cover.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
