@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     "GSAP",
   ],
   description: siteDescription,
-  authors: [{ name: "Nestor Rios Garcia" }],
+  authors: [{ name: "Nestor Rios Garcia", url: "https://nestorrig.com" }],
   creator: "Nestor Rios Garcia",
 
   //* Open Graph
