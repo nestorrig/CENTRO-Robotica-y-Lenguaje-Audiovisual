@@ -19,22 +19,31 @@ const PANEL_COUNT = 12;
 const PANEL_WIDTH = 1.6;
 const PANEL_HEIGHT = 0.9;
 const PANEL_GAP = 0.3;
-const RING_RADIUS = ((PANEL_WIDTH + PANEL_GAP) * PANEL_COUNT) / (Math.PI * 2);
-const PANEL_ARC = PANEL_WIDTH / RING_RADIUS;
 const RING_SPEED = 0.18;
 const MOBILE_BREAKPOINT = 768;
 
+// Radio con el que `count` paneles y sus separaciones llenan la circunferencia.
+function ringRadius(count: number) {
+  return ((PANEL_WIDTH + PANEL_GAP) * count) / (Math.PI * 2);
+}
+
 // Tramo de cilindro abierto: el arco mide PANEL_WIDTH, así el shader conserva el 16:9.
-const panelGeometry = new THREE.CylinderGeometry(
-  RING_RADIUS,
-  RING_RADIUS,
-  PANEL_HEIGHT,
-  48,
-  1,
-  true,
-  -PANEL_ARC / 2,
-  PANEL_ARC,
-);
+function createPanelGeometry(radius: number) {
+  const arc = PANEL_WIDTH / radius;
+  return new THREE.CylinderGeometry(
+    radius,
+    radius,
+    PANEL_HEIGHT,
+    10,
+    1,
+    true,
+    -arc / 2,
+    arc,
+  );
+}
+
+const RING_RADIUS = ringRadius(PANEL_COUNT);
+const panelGeometry = createPanelGeometry(RING_RADIUS);
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -42,6 +51,48 @@ const vertexShader = /* glsl */ `
   void main() {
     vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+// La onda se evalúa a lo largo del listón (uWaveOffset es la posición del panel sobre
+// él), así la banda y los paneles que viajan encima comparten exactamente la misma curva.
+// Una segunda onda (wobble) con su propio ritmo rompe la regularidad; la suma se
+// normaliza para no rebasar uWaveAmplitude / uWaveDepth.
+const ribbonVertexShader = /* glsl */ `
+  uniform float uWaveTime;
+  uniform float uWaveSpeed;
+  uniform float uWaveAmplitude;
+  uniform float uWaveFrequency;
+  uniform float uWaveDepth;
+  uniform float uWavePhase;
+  uniform float uWaveOffset;
+  uniform float uWobbleAmount;
+  uniform float uWobbleFrequency;
+  uniform float uWobbleSpeed;
+  uniform float uWobblePhase;
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    float x = position.x + uWaveOffset;
+    float wave = x * uWaveFrequency - uWaveTime * uWaveSpeed + uWavePhase;
+    float wobble = x * uWobbleFrequency - uWaveTime * uWobbleSpeed + uWobblePhase;
+    float norm = 1.0 / (1.0 + uWobbleAmount);
+    vec3 bent = vec3(
+      x,
+      position.y + uWaveAmplitude * (sin(wave) + uWobbleAmount * sin(wobble)) * norm,
+      position.z + uWaveDepth * (cos(wave) + uWobbleAmount * cos(wobble)) * norm
+    );
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(bent, 1.0);
+  }
+`;
+
+const ribbonBandFragmentShader = /* glsl */ `
+  uniform vec3 uColor;
+
+  void main() {
+    gl_FragColor = vec4(uColor, 1.0);
+    #include <colorspace_fragment>
   }
 `;
 
@@ -418,22 +469,80 @@ type Panel = {
 
 const PANEL_SWATCHES = [palette.ink, palette.primary2, palette.accent];
 
-const PANELS: Panel[] = (() => {
-  const random = mulberry32(2026);
-  const seeds = mulberry32(73);
+function buildPanels(
+  count: number,
+  colorSeed: number,
+  motionSeed: number,
+  ruleOffset = 0,
+): Panel[] {
+  const random = mulberry32(colorSeed);
+  const seeds = mulberry32(motionSeed);
 
-  return Array.from({ length: PANEL_COUNT }, (_, i) => {
+  return Array.from({ length: count }, (_, i) => {
     const [background, line] = shuffle(PANEL_SWATCHES, random);
     return {
-      rule: RULE_LIST[i % RULE_LIST.length],
+      rule: RULE_LIST[(i + ruleOffset) % RULE_LIST.length],
       background,
       line,
       seed: seeds(),
     };
   });
-})();
+}
 
-function CompositionPanel({ panel, angle }: { panel: Panel; angle: number }) {
+const PANELS = buildPanels(PANEL_COUNT, 2026, 73);
+
+function useSceneScale() {
+  return useThree((state) => (state.size.width < MOBILE_BREAKPOINT ? 2 : 1));
+}
+
+type RibbonWobble = {
+  amount: number;
+  frequency: number;
+  speed: number;
+  phase: number;
+};
+
+type RibbonWave = {
+  amplitude: number;
+  frequency: number;
+  depth: number;
+  speed: number;
+  phase: number;
+  wobble?: RibbonWobble;
+};
+
+function ribbonUniforms(ribbon?: RibbonWave) {
+  return {
+    uWaveTime: { value: 0 },
+    uWaveSpeed: { value: ribbon?.speed ?? 0 },
+    uWaveAmplitude: { value: ribbon?.amplitude ?? 0 },
+    uWaveFrequency: { value: ribbon?.frequency ?? 0 },
+    uWaveDepth: { value: ribbon?.depth ?? 0 },
+    uWavePhase: { value: ribbon?.phase ?? 0 },
+    uWaveOffset: { value: 0 },
+    uWobbleAmount: { value: ribbon?.wobble?.amount ?? 0 },
+    uWobbleFrequency: { value: ribbon?.wobble?.frequency ?? 0 },
+    uWobbleSpeed: { value: ribbon?.wobble?.speed ?? 0 },
+    uWobblePhase: { value: ribbon?.wobble?.phase ?? 0 },
+  };
+}
+
+function CompositionPanel({
+  panel,
+  angle,
+  geometry = panelGeometry,
+  rotationY = angle,
+  ribbon,
+  ribbonOffset,
+}: {
+  panel: Panel;
+  angle: number;
+  geometry?: THREE.BufferGeometry;
+  rotationY?: number;
+  ribbon?: RibbonWave;
+  // Posición del panel a lo largo del listón en función del tiempo.
+  ribbonOffset?: (time: number) => number;
+}) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(
     () => ({
@@ -443,21 +552,27 @@ function CompositionPanel({ panel, angle }: { panel: Panel; angle: number }) {
       uSeed: { value: panel.seed },
       uBackground: { value: new THREE.Color(panel.background) },
       uLine: { value: new THREE.Color(panel.line) },
+      ...ribbonUniforms(ribbon),
     }),
-    [panel],
+    [panel, ribbon],
   );
 
   useFrame((state) => {
     const material = materialRef.current;
     if (!material) return;
-    material.uniforms.uTime.value = state.clock.elapsedTime + angle;
+    const time = state.clock.elapsedTime;
+    material.uniforms.uTime.value = time + angle;
+    if (ribbon) {
+      material.uniforms.uWaveTime.value = time;
+      material.uniforms.uWaveOffset.value = ribbonOffset?.(time) ?? 0;
+    }
   });
 
   return (
-    <mesh geometry={panelGeometry} rotation={[0, angle, 0]}>
+    <mesh geometry={geometry} rotation={[0, rotationY, 0]}>
       <shaderMaterial
         ref={materialRef}
-        vertexShader={vertexShader}
+        vertexShader={ribbon ? ribbonVertexShader : vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
         side={THREE.DoubleSide}
@@ -467,9 +582,11 @@ function CompositionPanel({ panel, angle }: { panel: Panel; angle: number }) {
   );
 }
 
-export function LenguajeAudiovisualScene() {
+// ─── Producción ─────────────────────────────────────────────────────────────
+// Un solo anillo de 12 paneles curvos, inclinado y girando sobre Y.
+function ProductionVisualization() {
   const ringRef = useRef<THREE.Group>(null);
-  const isMobile = useThree((state) => state.size.width < MOBILE_BREAKPOINT);
+  const scale = useSceneScale();
 
   useFrame((state) => {
     const ring = ringRef.current;
@@ -478,11 +595,7 @@ export function LenguajeAudiovisualScene() {
   });
 
   return (
-    <group
-      rotation={[0.2, 0, 0]}
-      position={[0, 0.05, 0]}
-      scale={isMobile ? 2 : 1}
-    >
+    <group rotation={[0.24, 0, 0]} position={[0, 0.1, 0]} scale={scale}>
       <group ref={ringRef}>
         {PANELS.map((panel, i) => (
           <CompositionPanel
@@ -494,4 +607,540 @@ export function LenguajeAudiovisualScene() {
       </group>
     </group>
   );
+}
+
+// ─── Experimento: anillos múltiples girando en todos los ejes ───────────────
+// Prompts:
+// 1. "lo que ahora quiero es que agregues ma anillis interiores y experiores,
+//    suamndo o restandoi rectangulos y dales una rotacion distinta"
+// 2. "tambien rota en los demas ejes"
+// 3. "cada anillo tendra el mismo color de bg y lineas y circulos, cambian entre anillos"
+//
+// Anillos concéntricos con el mismo tamaño de panel: los interiores restan paneles y
+// los exteriores suman, así el radio sale del número de paneles. Cada uno gira sobre
+// su eje y además da vueltas sobre X y Z a su propia velocidad, como un giroscopio.
+// Al estar en radios distintos nunca se cruzan entre sí. Todos los paneles de un anillo
+// comparten fondo y color de línea; cada anillo usa una combinación distinta.
+type RingConfig = {
+  count: number;
+  tilt: [number, number, number];
+  speed: number;
+  seed: number;
+  // Velocidad de giro de todo el anillo sobre X y Z.
+  tumble: [number, number];
+  background: string;
+  line: string;
+};
+
+const TUMBLING_RING_CONFIGS: RingConfig[] = [
+  {
+    count: 5,
+    tilt: [0.9, 0, 0.35],
+    speed: -1.2,
+    seed: 11,
+    tumble: [0.53, -0.7],
+    background: palette.primary1,
+    line: palette.accent,
+  },
+  {
+    count: 8,
+    tilt: [-0.55, 0, -0.5],
+    speed: 0.8,
+    seed: 23,
+    tumble: [-0.5, 0.12],
+    background: palette.paper,
+    line: palette.primary2,
+  },
+  {
+    count: 11,
+    tilt: [0.2, 0, 0.8],
+    speed: 0.5,
+    seed: 2026,
+    tumble: [0.53, 0.15],
+    background: palette.ink,
+    line: palette.paper,
+  },
+  {
+    count: 13,
+    tilt: [0.2, 0, 0],
+    speed: 0.18,
+    seed: 2026,
+    tumble: [0.3, 0.5],
+    background: palette.accent,
+    line: palette.ink,
+  },
+  {
+    count: 16,
+    tilt: [-0.3, 0, 0.83],
+    speed: -0.51,
+    seed: 47,
+    tumble: [-0.4, -0.26],
+    background: palette.primary2,
+    line: palette.paper,
+  },
+];
+
+function buildRings(configs: RingConfig[]) {
+  return configs.map((config, ringIndex) => ({
+    ...config,
+    geometry: createPanelGeometry(ringRadius(config.count)),
+    panels: buildPanels(
+      config.count,
+      config.seed,
+      config.seed + 1,
+      ringIndex,
+    ).map((panel) => ({
+      ...panel,
+      background: config.background,
+      line: config.line,
+    })),
+  }));
+}
+
+type Ring = ReturnType<typeof buildRings>[number];
+
+const TUMBLING_RINGS = buildRings(TUMBLING_RING_CONFIGS);
+
+function SpinningRing({ ring }: { ring: Ring }) {
+  const tiltRef = useRef<THREE.Group>(null);
+  const ringRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const time = state.clock.elapsedTime;
+    const group = ringRef.current;
+    if (group) group.rotation.y = time * ring.speed;
+
+    const tilt = tiltRef.current;
+    if (tilt) {
+      tilt.rotation.x = ring.tilt[0] + time * ring.tumble[0];
+      tilt.rotation.z = ring.tilt[2] + time * ring.tumble[1];
+    }
+  });
+
+  return (
+    <group ref={tiltRef} rotation={ring.tilt}>
+      <group ref={ringRef}>
+        {ring.panels.map((panel, i) => (
+          <CompositionPanel
+            key={i}
+            panel={panel}
+            angle={(i / ring.count) * Math.PI * 2}
+            geometry={ring.geometry}
+          />
+        ))}
+      </group>
+    </group>
+  );
+}
+
+function TumblingRingVisualization() {
+  const scale = useSceneScale();
+
+  return (
+    <group position={[0, 0.05, 0]} scale={scale * 0.5}>
+      {TUMBLING_RINGS.map((ring, i) => (
+        <SpinningRing key={i} ring={ring} />
+      ))}
+    </group>
+  );
+}
+
+// ─── Experimento: marquesinas ───────────────────────────────────────────────
+// Prompt: "para la siguiente quiere que hagas marques de vayan de derecha a izquierda,
+// esta es una nueva vizualizacion"
+//
+// Filas de paneles planos 16:9 que avanzan de derecha a izquierda en bucle, cada fila
+// a su propia velocidad. Cada fila mide más que el ancho visible, así el salto de un
+// panel del borde izquierdo al derecho ocurre fuera de cuadro.
+const flatPanelGeometry = new THREE.PlaneGeometry(PANEL_WIDTH, PANEL_HEIGHT);
+const MARQUEE_GAP = 0.25;
+const MARQUEE_SPACING = PANEL_WIDTH + MARQUEE_GAP;
+const MARQUEE_ROW_GAP = 0.2;
+
+type MarqueeConfig = {
+  count: number;
+  speed: number;
+  seed: number;
+};
+
+const MARQUEE_CONFIGS: MarqueeConfig[] = [
+  { count: 10, speed: 0.55, seed: 101 },
+  { count: 10, speed: 0.35, seed: 202 },
+  { count: 10, speed: 0.75, seed: 303 },
+  { count: 10, speed: 0.45, seed: 404 },
+  { count: 10, speed: 0.65, seed: 505 },
+  { count: 10, speed: 0.3, seed: 606 },
+  { count: 10, speed: 0.5, seed: 707 },
+  { count: 10, speed: 0.8, seed: 808 },
+  { count: 10, speed: 0.4, seed: 99 },
+  { count: 10, speed: 0.6, seed: 1010 },
+  { count: 10, speed: 0.7, seed: 1111 },
+  { count: 10, speed: 0.35, seed: 1212 },
+  { count: 10, speed: 0.55, seed: 1313 },
+  { count: 10, speed: 0.75, seed: 1414 },
+];
+
+const MARQUEES = MARQUEE_CONFIGS.map((config, rowIndex) => {
+  const rowHeight = PANEL_HEIGHT + MARQUEE_ROW_GAP;
+  return {
+    ...config,
+    y: ((MARQUEE_CONFIGS.length - 1) / 2 - rowIndex) * rowHeight,
+    length: config.count * MARQUEE_SPACING,
+    // Desfase para que las columnas de filas vecinas no queden alineadas.
+    offset: rowIndex * MARQUEE_SPACING * 0.37,
+    panels: buildPanels(config.count, config.seed, config.seed + 1, rowIndex),
+  };
+});
+
+type Marquee = (typeof MARQUEES)[number];
+
+function MarqueePanel({
+  marquee,
+  panel,
+  index,
+}: {
+  marquee: Marquee;
+  panel: Panel;
+  index: number;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const group = groupRef.current;
+    if (!group) return;
+    const travel = index * MARQUEE_SPACING + marquee.offset;
+    group.position.x =
+      THREE.MathUtils.euclideanModulo(
+        travel - state.clock.elapsedTime * marquee.speed,
+        marquee.length,
+      ) -
+      marquee.length / 2;
+  });
+
+  return (
+    <group ref={groupRef} position-y={marquee.y}>
+      <CompositionPanel
+        panel={panel}
+        angle={index * 0.7 + marquee.y}
+        geometry={flatPanelGeometry}
+        rotationY={0}
+      />
+    </group>
+  );
+}
+
+function MarqueeVisualization() {
+  return (
+    <group>
+      {MARQUEES.map((marquee, row) =>
+        marquee.panels.map((panel, i) => (
+          <MarqueePanel
+            key={`${row}-${i}`}
+            marquee={marquee}
+            panel={panel}
+            index={i}
+          />
+        )),
+      )}
+    </group>
+  );
+}
+
+// ─── Experimento: marquesinas curvas ────────────────────────────────────────
+// Prompt: "ahora quieron marquesinas que se curvan, esta es otra nueva vizualizacion"
+// Prompt: "bien, pero me refieron que se curven en y como un liston"
+//
+// Prompt: "bien casi, pero quiero algo mas parecido a esto" (referencia: listones anchos
+// tipo "Flying Text Animation" que cruzan el cuadro en diagonal y se enciman)
+//
+// Prompt: "bien agrega otras 3 y evita que se intersecten"
+//
+// Seis listones de color que cruzan en diagonal a distintas profundidades. Cada uno es
+// una banda continua que ondula en Y y en Z, y los paneles viajan sobre ella de derecha
+// a izquierda como el texto de la referencia. Los paneles usan el color de su banda de
+// fondo, así solo se leen sus líneas y círculos encima del listón.
+//
+// El orden del arreglo es el orden de atrás hacia adelante. La Z de cada listón se
+// calcula para que su onda en profundidad nunca alcance a la del vecino: pueden
+// encimarse en pantalla, pero no atravesarse.
+const RIBBON_BAND_HEIGHT = 1.15;
+const RIBBON_PANEL_LIFT = 0.02;
+const RIBBON_LAYER_MARGIN = 0.2;
+
+const ribbonPanelGeometry = new THREE.PlaneGeometry(
+  PANEL_WIDTH,
+  PANEL_HEIGHT,
+  32,
+  1,
+);
+
+type RibbonConfig = {
+  count: number;
+  speed: number;
+  seed: number;
+  rotation: number;
+  y: number;
+  band: string;
+  line: string;
+  wave: RibbonWave;
+};
+
+const RIBBON_CONFIGS: RibbonConfig[] = [
+  {
+    count: 10,
+    speed: 0.45,
+    seed: 31,
+    rotation: 0.42,
+    y: -0.5,
+    band: palette.paper,
+    line: palette.primary2,
+    wave: {
+      amplitude: 0.6,
+      frequency: 0.4,
+      depth: 0.5,
+      speed: 0.6,
+      phase: 0,
+    },
+  },
+  {
+    count: 18,
+    speed: 0.5,
+    seed: 47,
+    rotation: -0.35,
+    y: 5,
+    band: palette.primary1,
+    line: palette.accent,
+    wave: {
+      amplitude: 1,
+      frequency: 0.26,
+      depth: 0.03,
+      speed: 0.55,
+      phase: 1.2,
+    },
+  },
+
+  {
+    count: 14,
+    speed: 0.35,
+    seed: 78,
+    rotation: 0.3,
+    y: -3.6,
+    band: palette.accent,
+    line: palette.primary1,
+    wave: {
+      amplitude: 0.8,
+      frequency: 0.4,
+      depth: 0.35,
+      speed: 0.45,
+      phase: 3.1,
+    },
+  },
+  // {
+  //   count: 14,
+  //   speed: 0.55,
+  //   seed: 85,
+  //   rotation: -0.08,
+  //   y: -1.55,
+  //   band: palette.paper,
+  //   line: palette.ink,
+  //   wave: {
+  //     amplitude: 0.75,
+  //     frequency: 0.44,
+  //     depth: 0.3,
+  //     speed: 0.65,
+  //     phase: 5.2,
+  //   },
+  // },
+  {
+    count: 9,
+    speed: 0.64,
+    seed: 93,
+    rotation: 0.12,
+    y: 2,
+    band: palette.ink,
+    line: palette.accent,
+    wave: {
+      amplitude: 0.5,
+      frequency: 0.38,
+      depth: 0.35,
+      speed: 0.5,
+      phase: 4,
+    },
+  },
+  {
+    count: 12,
+    speed: 0.6,
+    seed: 62,
+    rotation: -0.22,
+    y: 1.55,
+    band: palette.primary2,
+    line: palette.paper,
+    wave: {
+      amplitude: 0.4,
+      frequency: 0.4,
+      depth: 0.2,
+      speed: 0.7,
+      phase: 2.1,
+    },
+  },
+];
+
+function ribbonLayers(configs: RibbonConfig[]) {
+  const layers: number[] = [];
+  configs.forEach((config, i) => {
+    if (i === 0) {
+      layers.push(0);
+      return;
+    }
+    const previous = configs[i - 1];
+    layers.push(
+      layers[i - 1] +
+        previous.wave.depth +
+        config.wave.depth +
+        RIBBON_PANEL_LIFT +
+        RIBBON_LAYER_MARGIN,
+    );
+  });
+  const center = (layers[0] + layers[layers.length - 1]) / 2;
+  return layers.map((z) => z - center);
+}
+
+const RIBBON_LAYERS = ribbonLayers(RIBBON_CONFIGS);
+
+// Onda secundaria por listón, derivada de su seed: otra frecuencia, otra velocidad
+// (a veces en sentido contrario) y otra fase, para que no ondulen todos al mismo ritmo.
+// Se puede fijar a mano con `wave.wobble` en RIBBON_CONFIGS.
+function ribbonWobble(wave: RibbonWave, seed: number): RibbonWobble {
+  const random = mulberry32(seed * 7 + 3);
+  const direction = random() < 0.5 ? -1 : 1;
+  return {
+    amount: 0.35 + random() * 0.4,
+    frequency: wave.frequency * (1.7 + random() * 1.3),
+    speed: wave.speed * direction * (0.4 + random() * 0.8),
+    phase: random() * Math.PI * 2,
+  };
+}
+
+const RIBBONS = RIBBON_CONFIGS.map((config, ribbonIndex) => {
+  const length = config.count * MARQUEE_SPACING;
+  return {
+    ...config,
+    wave: {
+      ...config.wave,
+      wobble: config.wave.wobble ?? ribbonWobble(config.wave, config.seed),
+    },
+    z: RIBBON_LAYERS[ribbonIndex],
+    length,
+    bandGeometry: new THREE.PlaneGeometry(length, RIBBON_BAND_HEIGHT, 256, 1),
+    panels: buildPanels(
+      config.count,
+      config.seed,
+      config.seed + 1,
+      ribbonIndex,
+    ).map((panel) => ({
+      ...panel,
+      background: config.band,
+      line: config.line,
+    })),
+  };
+});
+
+type Ribbon = (typeof RIBBONS)[number];
+
+function RibbonBand({ ribbon }: { ribbon: Ribbon }) {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const uniforms = useMemo(
+    () => ({
+      uColor: { value: new THREE.Color(ribbon.band) },
+      ...ribbonUniforms(ribbon.wave),
+    }),
+    [ribbon],
+  );
+
+  useFrame((state) => {
+    const material = materialRef.current;
+    if (!material) return;
+    material.uniforms.uWaveTime.value = state.clock.elapsedTime;
+  });
+
+  return (
+    <mesh geometry={ribbon.bandGeometry}>
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={ribbonVertexShader}
+        fragmentShader={ribbonBandFragmentShader}
+        uniforms={uniforms}
+        side={THREE.DoubleSide}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+function RibbonPanel({
+  ribbon,
+  panel,
+  index,
+}: {
+  ribbon: Ribbon;
+  panel: Panel;
+  index: number;
+}) {
+  const offset = useMemo(
+    () => (time: number) =>
+      THREE.MathUtils.euclideanModulo(
+        index * MARQUEE_SPACING - time * ribbon.speed,
+        ribbon.length,
+      ) -
+      ribbon.length / 2,
+    [index, ribbon],
+  );
+
+  return (
+    <group position-z={RIBBON_PANEL_LIFT}>
+      <CompositionPanel
+        panel={panel}
+        angle={index * 0.7 + ribbon.seed}
+        geometry={ribbonPanelGeometry}
+        rotationY={0}
+        ribbon={ribbon.wave}
+        ribbonOffset={offset}
+      />
+    </group>
+  );
+}
+
+function CurvedMarqueeVisualization() {
+  return (
+    <group>
+      {RIBBONS.map((ribbon, r) => (
+        <group
+          key={r}
+          position={[0, ribbon.y, ribbon.z]}
+          rotation-z={ribbon.rotation}
+        >
+          <RibbonBand ribbon={ribbon} />
+          {ribbon.panels.map((panel, i) => (
+            <RibbonPanel key={i} ribbon={ribbon} panel={panel} index={i} />
+          ))}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ─── Selector ───────────────────────────────────────────────────────────────
+// Cambia ACTIVE_VISUALIZATION para ver otra versión; "produccion" es la final.
+const VISUALIZATIONS = {
+  produccion: ProductionVisualization,
+  anillosTodosLosEjes: TumblingRingVisualization,
+  marquesinas: MarqueeVisualization,
+  marquesinasCurvas: CurvedMarqueeVisualization,
+};
+
+const ACTIVE_VISUALIZATION: keyof typeof VISUALIZATIONS = "produccion";
+const ActiveVisualization = VISUALIZATIONS[ACTIVE_VISUALIZATION];
+
+export function LenguajeAudiovisualScene() {
+  return <ActiveVisualization />;
 }
