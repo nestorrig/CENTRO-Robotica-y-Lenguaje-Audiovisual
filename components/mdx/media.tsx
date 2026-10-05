@@ -11,7 +11,7 @@ function MediaFigure({
     <figure className="not-prose my-10">
       <div className="overflow-hidden bg-ink/8">{children}</div>
       {pie ? (
-        <figcaption className="mt-3 text-[0.68rem] leading-5 tracking-[0.22em] text-ink/50 uppercase [&_p]:m-0">
+        <figcaption className="mt-3 text-xs leading-5 tracking-widest text-ink/50 uppercase [&_p]:m-0 [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit">
           {pie}
         </figcaption>
       ) : null}

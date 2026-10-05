@@ -14,7 +14,7 @@ function Nota({
       <p className="text-[0.68rem] tracking-[0.22em] text-primary-1 uppercase">
         {titulo}
       </p>
-      <div className="mt-2 text-[1.02rem] leading-7 text-ink [&_p]:m-0">
+      <div className="mt-2 text-[1.02rem] leading-7 text-ink [&_p]:m-0 [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit">
         {children}
       </div>
     </aside>
@@ -36,7 +36,7 @@ function Toma({
         Toma {numero}
         {lugar ? ` · ${lugar}` : ""}
       </figcaption>
-      <div className="mt-2 text-[1.15rem] leading-8 text-ink italic [&_p]:m-0">
+      <div className="mt-2 text-[1.15rem] leading-8 text-ink italic [&_p]:m-0 [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit">
         {children}
       </div>
     </figure>
@@ -46,7 +46,7 @@ function Toma({
 function Cita({ autor, children }: { autor?: string; children: ReactNode }) {
   return (
     <blockquote className="not-prose my-12">
-      <div className="text-[1.4rem] leading-snug tracking-[-0.02em] text-ink sm:text-[1.65rem] [&_p]:m-0">
+      <div className="text-[1.4rem] leading-snug tracking-[-0.02em] text-ink sm:text-[1.65rem] [&_p]:m-0 [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit">
         {children}
       </div>
       {autor ? (
@@ -76,8 +76,10 @@ function Definicion({
         <dt className="font-didot text-[1.85rem] leading-tight tracking-[-0.03em] text-ink italic">
           {termino}
         </dt>
-        <dd className="mt-3 leading-7 text-ink [&_p]:m-0">
-          {children}
+        <dd className="mt-3 leading-7 text-ink">
+          <div className="[&_p]:m-0 [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit">
+            {children}
+          </div>
           {fuente ? (
             <p className="mt-3 text-[0.72rem] tracking-[0.18em] text-ink/50 uppercase">
               {fuente}
@@ -139,7 +141,7 @@ export const mdxComponents: MDXComponents = {
   hr: () => <hr className="my-12 border-ink/15" />,
   blockquote: (props) => (
     <blockquote
-      className="my-8 border-l-2 border-primary-1 pl-5 text-ink/60 italic"
+      className="my-8 border-l-2 border-primary-1 pl-5 text-ink/60 italic [&_p]:text-inherit"
       {...props}
     />
   ),
